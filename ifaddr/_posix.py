@@ -23,6 +23,7 @@ import os
 import ctypes.util
 import ipaddress
 import collections
+import platform
 import socket
 
 from typing import Iterable, Optional
@@ -46,7 +47,10 @@ ifaddrs._fields_ = [
 
 libc = ctypes.CDLL(ctypes.util.find_library("socket" if os.uname()[0] == "SunOS" else "c"), use_errno=True)  # type: ignore
 
-IFF_MULTICAST = 1 << 12
+if platform.system() == "Darwin" or "BSD" in platform.system():
+    IFF_MULTICAST = 1 << 15
+else:
+    IFF_MULTICAST = 1 << 12
 
 def get_adapters(include_unconfigured: bool = False) -> Iterable[shared.Adapter]:
     addr0 = addr = ctypes.POINTER(ifaddrs)()
