@@ -52,6 +52,7 @@ if platform.system() == "Darwin" or "BSD" in platform.system():
 else:
     IFF_MULTICAST = 1 << 12
 
+
 def get_adapters(include_unconfigured: bool = False) -> Iterable[shared.Adapter]:
     addr0 = addr = ctypes.POINTER(ifaddrs)()
     retval = libc.getifaddrs(ctypes.byref(addr))
@@ -70,7 +71,9 @@ def get_adapters(include_unconfigured: bool = False) -> Iterable[shared.Adapter]
                 index = socket.if_nametoindex(adapter_name)  # type: ignore
             except (OSError, AttributeError):
                 pass
-            ips[adapter_name] = shared.Adapter(adapter_name, adapter_name, [], index=index, multicast=multicast)
+            ips[adapter_name] = shared.Adapter(
+                adapter_name, adapter_name, [], index=index, multicast=multicast
+            )
         if ip is not None:
             ips[adapter_name].ips.append(ip)
 
