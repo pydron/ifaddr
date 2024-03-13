@@ -176,13 +176,13 @@ def sockaddr_to_ip(sockaddr_ptr: ctypes._Pointer) -> Optional[Union[_IPv4Address
         if sockaddr_ptr[0].sa_familiy == socket.AF_INET:
             ipv4 = ctypes.cast(sockaddr_ptr, ctypes.POINTER(sockaddr_in))
             ippacked = bytes(bytearray(ipv4[0].sin_addr))
-            ip = str(ipaddress.ip_address(ippacked))
+            ip = str(ipaddress.IPv4Address(ippacked))
             return ip
         elif sockaddr_ptr[0].sa_familiy == socket.AF_INET6:
             ipv6 = ctypes.cast(sockaddr_ptr, ctypes.POINTER(sockaddr_in6))
             flowinfo = ipv6[0].sin6_flowinfo
             ippacked = bytes(bytearray(ipv6[0].sin6_addr))
-            ip = str(ipaddress.ip_address(ippacked))
+            ip = str(ipaddress.IPv6Address(ippacked))
             scope_id = ipv6[0].sin6_scope_id
             return (ip, flowinfo, scope_id)
     return None
@@ -190,7 +190,8 @@ def sockaddr_to_ip(sockaddr_ptr: ctypes._Pointer) -> Optional[Union[_IPv4Address
 
 def ipv6_prefixlength(address: ipaddress.IPv6Address) -> int:
     prefix_length = 0
+    address_as_int = int(address)
     for i in range(address.max_prefixlen):
-        if int(address) >> i & 1:
+        if address_as_int >> i & 1:
             prefix_length = prefix_length + 1
     return prefix_length
